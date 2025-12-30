@@ -3,29 +3,42 @@
 function main() {
   const fs = require("fs");
   const lines = fs.readFileSync(0, "utf8").trim().split(/\n+/);
-  const [N, K] = lines[0].split(/\s+/).map(Number);
-  const S = lines[1];
-
-  const wordMap = new Map();
-  let max = 0;
-  for (let i = 0; i + K <= N; i++) {
-    const word = S.slice(i, i + K);
-    if (wordMap.has(word)) {
-      wordMap.set(word, wordMap.get(word) + 1);
-      max = Math.max(max, wordMap.get(word));
-    } else {
-      wordMap.set(word, 1);
-      max = Math.max(max, 1);
+  const [H, W] = lines[0].split(/\s+/).map(Number);
+  const grid = [];
+  for (let i = 1; i <= H; i++) {
+    grid.push(lines[i].split(""));
+  }
+  const directions = [
+    [1, 0],
+    [0, 1],
+    [-1, 0],
+    [0, -1],
+  ];
+  for (let i = 0; i < H; i++) {
+    for (let ii = 0; ii < W; ii++) {
+      const start = grid[i][ii];
+      if (start === ".") {
+        continue;
+      }
+      let thisResult = 0;
+      for (const [dh, dw] of directions) {
+        const nh = i + dh;
+        const nw = ii + dw;
+        if (nh < 0 || nh >= H || nw < 0 || nw >= W) {
+          continue;
+        }
+        const next = grid[nh][nw];
+        if (next === "#") {
+          thisResult++;
+        }
+      }
+      if (thisResult != 2 && thisResult != 4) {
+        console.log("No");
+        return;
+      }
     }
   }
-  const maxWords = new Set();
-  for (const [word, count] of wordMap) {
-    if (count === max) {
-      maxWords.add(word);
-    }
-  }
-  console.log(max);
-  console.log(Array.from(maxWords).sort().join(" "));
+  console.log("Yes");
 }
 
 main();
